@@ -40,6 +40,9 @@ migrate_working_dir/
 **/.env*
 **/*.json.secret*
 
+# Explicitly keep firebase.json tracked
+/firebase.json
+
 # Symbolication related
 app.*.symbols
 
