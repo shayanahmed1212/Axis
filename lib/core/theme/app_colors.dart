@@ -1,43 +1,72 @@
-// Axis Design Tokens — Color Palette
-// The instrument face: dark surfaces with cool undertones,
-// steel blue as working color, warm golden as the calibration mark.
+// Axis Color System — Confident Color-Block Bento
+// Every card is a solid color block. Accent yellow is interactive-only.
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Canvas and surface colors — the instrument face
-  // Cool blue-black undertones, like machined metal catching different light
-  static const Color canvas = Color(0xFF0A0B0D);
-  static const Color surface1 = Color(0xFF111318);
-  static const Color surface2 = Color(0xFF181B22);
-  static const Color surface3 = Color(0xFF1E2129);
+  // Canvas & neutrals
+  static const Color canvas = Color(0xFFF6F5F1);
+  static const Color surfaceDark = Color(0xFF15161A);
+  static const Color ink = Color(0xFF15161A);
+  static const Color inkOnDark = Color(0xFFFFFFFF);
+  static const Color inkMuted = Color(0xFF6B6D76);
+  static const Color inkMutedOnDark = Color(0xFFB7B9C2);
 
-  // Text colors — hierarchy through lightness, not decoration
-  static const Color ink = Color(0xFFECEDF0);
-  static const Color inkMuted = Color(0xFFA8ADB8);
-  static const Color inkSubtle = Color(0xFF6B7080);
+  // Block palette — full-bleed card fills
+  static const Color blockSage = Color(0xFFC8E6C9);
+  static const Color blockSageText = Color(0xFF1E3A24);
+  static const Color blockLavender = Color(0xFFDED9F7);
+  static const Color blockLavenderText = Color(0xFF2E2555);
+  static const Color blockPeach = Color(0xFFF8DFC0);
+  static const Color blockPeachText = Color(0xFF5A3A12);
+  static const Color blockCoral = Color(0xFFF7C9CB);
+  static const Color blockCoralText = Color(0xFF5C1D22);
+  static const Color blockSky = Color(0xFFC9E4F5);
+  static const Color blockSkyText = Color(0xFF123A54);
+  static const Color blockBlack = Color(0xFF15161A);
+  static const Color blockBlackText = Color(0xFFFFFFFF);
 
-  // Primary — technical ink, the working color of the interface
-  // Cooler and more restrained than a brand blue: the shade of a machinist's scale
-  static const Color primary = Color(0xFF4A7CDB);
-  static const Color primaryHover = Color(0xFF6A9AE8);
-  static const Color primaryFocus = Color(0xFF3D6BC4);
-  static const Color onPrimary = Color(0xFFFFFFFF);
+  // Accent — interactive/primary ONLY
+  static const Color accent = Color(0xFFFFC93C);
+  static const Color accentInk = Color(0xFF15161A);
 
-  // Accent — golden amber, the calibration mark
-  // Warm gold on cool steel: the single illuminated mark on an instrument dial.
-  // Used in exactly two places: completion animation stroke, active filter pill.
-  static const Color accent = Color(0xFFC9A84C);
-  static const Color accentSoft = Color(0x26C9A84C);
+  // Semantic
+  static const Color success = Color(0xFF2E7D46);
+  static const Color error = Color(0xFFC23B3F);
 
-  // Status colors — instrument indicator lights, not gamified confetti
-  static const Color success = Color(0xFF3DAA6A);
-  static const Color error = Color(0xFFD94A4A);
+  // Card surface (for task cards that aren't block-color)
+  static const Color cardWhite = Color(0xFFFFFFFF);
+  static const Color cardDark = Color(0xFF1E1F24);
 
-  // Border colors — engraved guidelines, visible only when you look
-  static const Color hairline = Color(0xFF1E2129);
-  static const Color hairlineStrong = Color(0xFF2A2D36);
+  // Priority ribbon colors
+  static const Color priorityHigh = blockCoral;
+  static const Color priorityHighText = blockCoralText;
+  static const Color priorityMedium = accent;
+  static const Color priorityMediumText = accentInk;
+  static const Color priorityLow = blockSage;
+  static const Color priorityLowText = blockSageText;
 
-  // Semantic synonyms
-  static const Color completed = success;
-  static const Color incomplete = hairline;
+  // Hairline
+  static const Color hairline = Color(0xFFE5E5EA);
+  static const Color hairlineOnDark = Color(0xFF2A2B30);
+
+  // ── Backward-compatible aliases (old Apple system → new bento) ──
+  static const Color primary = accent;
+  static const Color onPrimary = accentInk;
+  static const Color primaryFocus = accent;
+  static const Color primaryDim = Color(0xFFE6B800);
+  static const Color primaryBright = accent;
+  static Color get primarySoft => accent.withOpacity(0.10);
+  static const Color surfacePearl = cardWhite;
+  static const Color surface0 = canvas;
+  static const Color surface1 = canvas;
+  static const Color surface2 = cardWhite;
+  static const Color surface3 = cardWhite;
+  static const Color canvasParchment = canvas;
+  static const Color onDark = inkOnDark;
+  static const Color hairlineStrong = hairline;
+  static const Color dividerSoft = hairline;
+  static const Color inkSubtle = inkMuted;
+  static const Color priorityLowSoft = blockSage;
+  static Color get priorityMediumSoft => accent.withOpacity(0.10);
+  static const Color priorityHighSoft = blockCoral;
 }

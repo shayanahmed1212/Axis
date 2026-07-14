@@ -1,3 +1,4 @@
+// Forgot Password — blockPeach hero per spec section 5.4
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
@@ -6,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:axis/core/theme/app_colors.dart';
+import 'package:axis/core/theme/app_tokens.dart';
 import 'package:axis/core/theme/app_typography.dart';
-import 'package:axis/core/widgets/primary_button.dart';
 import 'package:axis/core/widgets/app_text_field.dart';
 import 'package:axis/core/utils/validators.dart';
 import 'package:axis/core/widgets/app_snackbar.dart';
@@ -64,46 +65,66 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         foregroundColor: AppColors.ink,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.go('/login'),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppTokens.lg),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 32),
-                Text(
-                  'Reset Password',
-                  style: GoogleFonts.getFont(
-                    AppTypography.displayFamily,
-                    fontSize: AppTypography.displaySize,
-                    fontWeight: FontWeight(AppTypography.displayWeight),
-                    letterSpacing: AppTypography.displayLetterSpacing,
-                    color: AppColors.ink,
+                const SizedBox(height: 12),
+
+                // blockPeach hero panel
+                Container(
+                  padding: const EdgeInsets.all(AppTokens.xl),
+                  decoration: BoxDecoration(
+                    color: AppColors.blockPeach,
+                    borderRadius: BorderRadius.circular(AppTokens.radiusXl),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Enter your email and we'll send you a reset link",
-                  style: GoogleFonts.getFont(
-                    AppTypography.bodyFamily,
-                    fontSize: AppTypography.bodySize,
-                    fontWeight: FontWeight(AppTypography.bodyWeight),
-                    color: AppColors.inkMuted,
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.lock_reset_rounded,
+                        size: 56,
+                        color: AppColors.blockPeachText,
+                      ),
+                      const SizedBox(height: AppTokens.md),
+                      Text(
+                        'Reset Password',
+                        style: GoogleFonts.sora(
+                          fontSize: AppTypography.screenTitleSize,
+                          fontWeight: FontWeight(AppTypography.screenTitleWeight),
+                          letterSpacing: AppTypography.screenTitleTracking,
+                          color: AppColors.blockPeachText,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppTokens.xs),
+                      Text(
+                        "Enter your email and we'll send you a reset link",
+                        style: GoogleFonts.inter(
+                          fontSize: AppTypography.bodySize,
+                          fontWeight: FontWeight(AppTypography.bodyWeight),
+                          color: AppColors.blockPeachText.withOpacity(0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
+
+                const SizedBox(height: AppTokens.xl),
+
                 AuthErrorBanner(
                   message: _errorMessage,
                   onDismiss: () => setState(() => _errorMessage = null),
                 ),
+
                 AppTextField(
                   label: 'Email',
                   hintText: 'Enter your email',
@@ -111,18 +132,50 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   keyboardType: TextInputType.emailAddress,
                   validator: Validators.validateEmail,
                 ),
-                const SizedBox(height: 24),
-                PrimaryButton(text: 'Send Reset Link', onPressed: _resetPassword, isLoading: _isLoading, isFullWidth: true),
-                const SizedBox(height: 16),
+
+                const SizedBox(height: AppTokens.lg),
+
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _resetPassword,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: AppColors.accentInk,
+                      disabledBackgroundColor: AppColors.accent.withOpacity(0.4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppTokens.radiusPill),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.accentInk),
+                            ),
+                          )
+                        : Text(
+                            'Send Reset Link',
+                            style: GoogleFonts.inter(
+                              fontSize: AppTypography.buttonSize,
+                              fontWeight: FontWeight(AppTypography.buttonWeight),
+                            ),
+                          ),
+                  ),
+                ),
+
+                const SizedBox(height: AppTokens.md),
+
                 TextButton(
                   onPressed: () => context.go('/login'),
                   child: Text(
                     'Back to Login',
-                    style: GoogleFonts.getFont(
-                      AppTypography.bodyFamily,
+                    style: GoogleFonts.inter(
                       fontSize: AppTypography.buttonSize,
                       fontWeight: FontWeight(AppTypography.buttonWeight),
-                      color: AppColors.primary,
+                      color: Color(0xFFB08900),
                     ),
                   ),
                 ),

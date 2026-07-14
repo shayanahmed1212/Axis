@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
+import 'pressable.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
@@ -23,34 +24,48 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: isFullWidth ? double.infinity : null,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.onPrimary,
-          disabledBackgroundColor: AppColors.primary.withOpacity(0.6),
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTokens.radiusMd)),
+    final isEnabled = onPressed != null && !isLoading;
+
+    return Pressable(
+      onTap: isLoading ? null : onPressed,
+      enabled: !isLoading,
+      child: Semantics(
+        label: text,
+        button: true,
+        enabled: isEnabled,
+        child: SizedBox(
+          width: isFullWidth ? double.infinity : null,
+          child: ElevatedButton(
+            onPressed: isEnabled ? () {} : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.accent,
+              foregroundColor: AppColors.accentInk,
+              disabledBackgroundColor: AppColors.accent.withOpacity(0.4),
+              disabledForegroundColor: AppColors.accentInk.withOpacity(0.5),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTokens.radiusPill),
+              ),
+            ),
+            child: isLoading
+                ? const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.accentInk),
+                    ),
+                  )
+                : Text(
+                    text,
+                    style: GoogleFonts.inter(
+                      fontSize: AppTypography.buttonSize,
+                      fontWeight: FontWeight(AppTypography.buttonWeight),
+                    ),
+                  ),
+          ),
         ),
-        child: isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
-                ),
-              )
-            : Text(text,
-                style: GoogleFonts.getFont(
-                  AppTypography.bodyFamily,
-                  fontSize: AppTypography.buttonSize,
-                  fontWeight: FontWeight(AppTypography.buttonWeight),
-                  letterSpacing: AppTypography.buttonLetterSpacing,
-                )),
       ),
     );
   }

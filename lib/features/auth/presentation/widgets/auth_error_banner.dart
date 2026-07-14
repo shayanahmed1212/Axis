@@ -18,24 +18,23 @@ class AuthErrorBanner extends StatelessWidget {
     if (message == null || message!.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 17),
       decoration: BoxDecoration(
-        color: AppColors.error.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-        border: Border.all(color: AppColors.error.withOpacity(0.3)),
+        color: AppColors.error.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(AppTokens.radiusSm),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: 20),
-          const SizedBox(width: 12),
+          const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 18),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               message!,
               style: GoogleFonts.getFont(
                 AppTypography.bodyFamily,
-                fontSize: AppTypography.bodySmSize,
-                fontWeight: FontWeight(AppTypography.bodySmWeight),
+                fontSize: AppTypography.captionSize,
+                fontWeight: FontWeight(AppTypography.captionWeight),
                 color: AppColors.error,
               ),
             ),
@@ -43,7 +42,7 @@ class AuthErrorBanner extends StatelessWidget {
           if (onDismiss != null)
             GestureDetector(
               onTap: onDismiss,
-              child: const Icon(Icons.close, color: AppColors.inkSubtle, size: 18),
+              child: const Icon(Icons.close_rounded, color: AppColors.inkMuted, size: 16),
             ),
         ],
       ),

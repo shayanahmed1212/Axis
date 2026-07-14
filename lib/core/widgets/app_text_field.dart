@@ -18,6 +18,7 @@ class AppTextField extends StatelessWidget {
   final int? maxLength;
   final Widget? suffixIcon;
   final Widget? prefixIcon;
+  final FocusNode? focusNode;
 
   const AppTextField({
     super.key,
@@ -31,6 +32,7 @@ class AppTextField extends StatelessWidget {
     this.maxLength,
     this.suffixIcon,
     this.prefixIcon,
+    this.focusNode,
   });
 
   @override
@@ -45,14 +47,15 @@ class AppTextField extends StatelessWidget {
               label!,
               style: GoogleFonts.getFont(
                 AppTypography.bodyFamily,
-                fontSize: AppTypography.bodySize,
-                fontWeight: FontWeight(AppTypography.bodyWeight),
+                fontSize: AppTypography.captionSize,
+                fontWeight: FontWeight(AppTypography.captionWeight),
                 color: AppColors.inkMuted,
               ),
             ),
           ),
         TextFormField(
           controller: controller,
+          focusNode: focusNode,
           obscureText: obscureText,
           keyboardType: keyboardType,
           maxLines: maxLines,
@@ -69,33 +72,33 @@ class AppTextField extends StatelessWidget {
               AppTypography.bodyFamily,
               fontSize: AppTypography.bodySize,
               fontWeight: FontWeight(AppTypography.bodyWeight),
-              color: AppColors.inkSubtle,
+              color: AppColors.inkMuted,
             ),
             suffixIcon: suffixIcon,
             prefixIcon: prefixIcon,
             filled: true,
-            fillColor: AppColors.surface1,
+            fillColor: AppColors.canvas,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.hairline, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.hairline, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+              borderSide: const BorderSide(color: AppColors.accent, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.error, width: 1),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 12),
           ),
           validator: validator,
         ),

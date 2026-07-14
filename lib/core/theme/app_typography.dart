@@ -1,53 +1,92 @@
-// Axis Design Tokens — Typography
-// Space Grotesk for display/headlines: technical character, geometric precision.
-// Inter for body/UI: tabular figures, neutral clarity, functional complement.
-class AppTypography {
-  // Display font — restrained personality for headlines and the app name
-  static const String displayFamily = 'Space Grotesk';
+// Axis Typography — Sora for display, Inter for UI
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-  // Body font — justified by tabular figures and neutral clarity
+class AppTypography {
+  // Display font — Sora for big numbers and screen titles
+  static const String displayFamily = 'Sora';
+  // Body font — Inter for everything else
   static const String bodyFamily = 'Inter';
 
-  // Legacy alias — prefer displayFamily/bodyFamily
-  static const String fontFamily = bodyFamily;
+  // Hero numeral — big stat card numbers
+  static const double heroNumeralSize = 40;
+  static const int heroNumeralWeight = 800;
+  static const double heroNumeralTracking = -0.02;
 
-  // Display — used with restraint: app name, screen titles, dashboard heading
-  static const double displaySize = 28.0;
-  static const int displayWeight = 700;
-  static const double displayLetterSpacing = -0.5;
+  // Screen title
+  static const double screenTitleSize = 26;
+  static const int screenTitleWeight = 700;
+  static const double screenTitleTracking = -0.01;
 
-  // Headline — section headers, screen titles
-  static const double headlineSize = 20.0;
-  static const int headlineWeight = 600;
-  static const double headlineLetterSpacing = -0.3;
+  // Section header
+  static const double sectionHeaderSize = 18;
+  static const int sectionHeaderWeight = 700;
 
-  // Card title — task titles, prominent labels
-  static const double cardTitleSize = 16.0;
-  static const int cardTitleWeight = 500;
-  static const double cardTitleLetterSpacing = 0;
+  // Card title (task title)
+  static const double cardTitleSize = 16;
+  static const int cardTitleWeight = 600;
 
-  // Body — descriptions, form text, general UI
-  static const double bodySize = 15.0;
+  // Body
+  static const double bodySize = 14;
   static const int bodyWeight = 400;
-  static const double bodyLetterSpacing = 0;
 
-  // Body small — secondary info, metadata
-  static const double bodySmSize = 13.0;
-  static const int bodySmWeight = 400;
-  static const double bodySmLetterSpacing = 0;
-
-  // Caption — labels, timestamps, priority pills
-  static const double captionSize = 11.0;
+  // Meta/caption
+  static const double captionSize = 12;
   static const int captionWeight = 500;
-  static const double captionLetterSpacing = 0.3;
+  static const double captionTracking = 0.01;
 
-  // Button — all buttons, slightly wider tracking for legibility
-  static const double buttonSize = 14.0;
+  // Ribbon tag text
+  static const double ribbonSize = 10;
+  static const int ribbonWeight = 700;
+  static const double ribbonTracking = 0.04;
+
+  // Button label
+  static const double buttonSize = 15;
   static const int buttonWeight = 600;
-  static const double buttonLetterSpacing = 0.2;
 
-  // Legacy aliases
-  static const double displayMdSize = displaySize;
-  static const int displayMdWeight = displayWeight;
-  static const double displayMdLetterSpacing = displayLetterSpacing;
+  // Helper — get Sora TextStyle
+  static TextStyle display({
+    double? size,
+    int? weight,
+    double? letterSpacing,
+    Color? color,
+  }) {
+    return GoogleFonts.sora(
+      fontSize: size ?? screenTitleSize,
+      fontWeight: FontWeight(weight ?? screenTitleWeight),
+      letterSpacing: letterSpacing ?? screenTitleTracking,
+      color: color,
+    );
+  }
+
+  // ── Backward-compatible aliases (old Apple system → new bento) ──
+  static const double headlineSize = screenTitleSize;
+  static const int headlineWeight = screenTitleWeight;
+  static const double headlineLetterSpacing = screenTitleTracking;
+  static const double titleSize = sectionHeaderSize;
+  static const int titleWeight = sectionHeaderWeight;
+  static const double titleLetterSpacing = 0.0;
+  static const double bodySmSize = captionSize;
+  static const int bodySmWeight = captionWeight;
+  static const double bodyLetterSpacing = 0.0;
+  static const double buttonLetterSpacing = 0.0;
+  static const double captionLetterSpacing = captionTracking;
+  static const double displaySize = screenTitleSize;
+  static const int displayWeight = screenTitleWeight;
+  static const double displayLetterSpacing = screenTitleTracking;
+
+  // Helper — get Inter TextStyle
+  static TextStyle body({
+    double? size,
+    int? weight,
+    double? letterSpacing,
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: size ?? bodySize,
+      fontWeight: FontWeight(weight ?? bodyWeight),
+      letterSpacing: letterSpacing,
+      color: color,
+    );
+  }
 }

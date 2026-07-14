@@ -1,10 +1,8 @@
 // ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-
+import 'package:axis/core/config/settings_providers.dart';
 import 'package:axis/core/theme/app_colors.dart';
 import 'package:axis/core/theme/app_typography.dart';
 import 'package:axis/features/auth/application/auth_controller.dart';
@@ -17,7 +15,12 @@ class SplashScreen extends ConsumerWidget {
     ref.listen(authStateProvider, (prev, next) {
       next.whenData((user) {
         if (user != null) {
-          context.go('/dashboard');
+          final onboardingComplete = ref.read(onboardingCompleteProvider);
+          if (onboardingComplete) {
+            context.go('/dashboard');
+          } else {
+            context.go('/onboarding');
+          }
         } else {
           context.go('/login');
         }
@@ -25,51 +28,27 @@ class SplashScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: AppColors.blockBlack,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Axis mark — a single centered line, the calibration reference
-            Container(
-              width: 2,
-              height: 48,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppColors.accent, AppColors.primary],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
             Text(
               'Axis',
-              style: GoogleFonts.getFont(
-                AppTypography.displayFamily,
-                fontSize: AppTypography.displaySize,
-                fontWeight: FontWeight(AppTypography.displayWeight),
-                letterSpacing: AppTypography.displayLetterSpacing,
-                color: AppColors.ink,
+              style: AppTypography.display(
+                size: 40,
+                weight: 700,
+                letterSpacing: -0.01,
+                color: AppColors.inkOnDark,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Find your center.',
-              style: GoogleFonts.getFont(
-                AppTypography.bodyFamily,
-                fontSize: AppTypography.bodySmSize,
-                fontWeight: FontWeight(AppTypography.bodySmWeight),
-                color: AppColors.inkSubtle,
-              ),
-            ),
-            const SizedBox(height: 48),
-            const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
+            const SizedBox(height: 16),
+            Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: AppColors.accent,
+                shape: BoxShape.circle,
               ),
             ),
           ],

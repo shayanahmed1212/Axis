@@ -1,5 +1,5 @@
 // Authentication repository for Firebase operations
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: unused_local_variable, prefer_const_constructors
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,6 +29,7 @@ class AuthRepository {
       if (uid == null) {
         throw AppException(type: AppExceptionType.unknown, message: 'Failed to sign in');
       }
+      await _auth.currentUser?.reload();
       return await _getUserProfile(uid);
     } on FirebaseAuthException catch (e) {
       throw AppExceptionMapper.mapFirebaseAuthError(e);
@@ -53,6 +54,8 @@ class AuthRepository {
       if (uid == null) {
         throw AppException(type: AppExceptionType.unknown, message: 'Failed to register user');
       }
+
+      final token = await userCredential.user?.getIdToken(true);
 
       final user = AppUser(
         id: uid,

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:axis/features/tasks/domain/task.dart';
+import 'package:axis/features/tasks/domain/task_filter.dart';
 import 'package:axis/features/tasks/data/task_repository.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:axis/features/tasks/domain/task.dart';
+import 'package:axis/features/tasks/domain/task_filter.dart';
 import 'package:axis/core/errors/app_exception.dart';
 import 'package:axis/core/errors/app_exception_types.dart';
 
@@ -90,7 +91,6 @@ class TaskRepository {
       await _tasksCollection.doc(taskId).update({
         'is_completed': isCompleted,
         'updated_at': Timestamp.fromDate(DateTime.now()),
-        'completed_at': isCompleted ? Timestamp.fromDate(DateTime.now()) : null,
       });
     } on FirebaseException catch (e) {
       throw _mapError(e);
@@ -111,4 +111,3 @@ class TaskRepository {
   }
 }
 
-enum TaskFilter { all, active, completed }

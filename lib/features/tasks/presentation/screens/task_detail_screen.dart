@@ -1,27 +1,23 @@
-// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, avoid_redundant_argument_values
-
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'package:axis/core/theme/app_colors.dart';
+import 'package:axis/core/theme/app_tokens.dart';
 import 'package:axis/core/theme/app_typography.dart';
-import 'package:axis/core/widgets/app_snackbar.dart';
-import 'package:axis/core/widgets/confirm_dialog.dart';
+import 'package:axis/core/widgets/priority_ribbon.dart';
+import 'package:axis/core/utils/haptics.dart';
 import 'package:axis/features/tasks/application/task_providers.dart';
 import 'package:axis/features/tasks/application/task_controller.dart';
 import 'package:axis/features/tasks/domain/task.dart';
-import 'package:axis/features/tasks/domain/task_priority.dart';
 
 class TaskDetailScreen extends ConsumerWidget {
   final String taskId;
-
   const TaskDetailScreen({super.key, required this.taskId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final taskAsync = ref.watch(taskDetailProvider(taskId));
+    final tasksAsync = ref.watch(taskListProvider);
 
     return Scaffold(
       backgroundColor: AppColors.canvas,
@@ -29,207 +25,164 @@ class TaskDetailScreen extends ConsumerWidget {
         backgroundColor: AppColors.canvas,
         foregroundColor: AppColors.ink,
         elevation: 0,
-        title: Text(
-          'Task Details',
-          style: GoogleFonts.getFont(
-            AppTypography.bodyFamily,
-            fontSize: AppTypography.cardTitleSize,
-            fontWeight: FontWeight(AppTypography.cardTitleWeight),
-            color: AppColors.ink,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () {
-              final currentTask = taskAsync.valueOrNull;
-              if (currentTask != null) {
-                context.push('/task/edit/${currentTask.id}');
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: () async {
-              final confirmed = await ConfirmDialog.show(
-                context,
-                title: 'Delete Task',
-                message: 'Are you sure you want to delete this task?',
-                confirmLabel: 'Delete',
-              );
-              if (confirmed == true) {
-                try {
-                  await ref.read(taskControllerProvider).deleteTask(taskId);
-                  AppSnackbar.show(context, 'Task deleted', type: SnackBarType.success);
-                  if (context.mounted) context.pop();
-                } catch (e) {
-                  AppSnackbar.show(context, 'Failed to delete task', type: SnackBarType.error);
-                }
-              }
-            },
-          ),
-        ],
+        leading: IconButton(icon: const Icon(Icons.chevron_left_rounded, size: 28), onPressed: () => context.pop()),
       ),
-      body: taskAsync.when(
-        loading: () => const Center(
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-            ),
-          ),
-        ),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Text(
-              'Error: $error',
-              style: GoogleFonts.getFont(
-                AppTypography.bodyFamily,
-                fontSize: AppTypography.bodySize,
-                fontWeight: FontWeight(AppTypography.bodyWeight),
-                color: AppColors.error,
+      body: tasksAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.accent)),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (tasks) {
+          final task = tasks.where((t) => t.id == taskId).firstOrNull;
+          if (task == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.search_off_rounded, size: 64, color: AppColors.inkMuted),
+                  const SizedBox(height: 16),
+                  Text('Task not found', style: AppTypography.body(size: 16, weight: 600, color: AppColors.ink)),
+                  const SizedBox(height: 8),
+                  Text('This task may have been deleted', style: AppTypography.body(size: 13, weight: 400, color: AppColors.inkMuted)),
+                  const SizedBox(height: 24),
+                  TextButton(onPressed: () => context.pop(), child: Text('Go back')),
+                ],
               ),
-            ),
-          ),
-        ),
-        data: (task) => _TaskDetailContent(
-          task: task,
-          onToggleComplete: () async {
-            try {
-              await ref.read(taskControllerProvider).toggleCompletion(task);
-              ref.invalidate(taskDetailProvider(taskId));
-            } catch (e) {
-              AppSnackbar.show(context, 'Failed to update task', type: SnackBarType.error);
-            }
-          },
-        ),
+            );
+          }
+          return _buildDetail(context, ref, task);
+        },
       ),
     );
   }
-}
 
-class _TaskDetailContent extends StatelessWidget {
-  final Task task;
-  final VoidCallback onToggleComplete;
+  Widget _buildDetail(BuildContext context, WidgetRef ref, Task task) {
+    final controller = ref.read(taskControllerProvider);
 
-  const _TaskDetailContent({required this.task, required this.onToggleComplete});
-
-  Color _priorityColor() {
-    return switch (task.priority) {
-      TaskPriority.low => AppColors.success,
-      TaskPriority.medium => AppColors.primary,
-      TaskPriority.high => AppColors.error,
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppTokens.pageMargin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              GestureDetector(
-                onTap: onToggleComplete,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: task.isCompleted ? AppColors.accent : AppColors.hairlineStrong,
-                      width: 2,
-                    ),
-                    color: task.isCompleted ? AppColors.accent : Colors.transparent,
-                  ),
-                  child: task.isCompleted
-                      ? const Icon(Icons.check, size: 16, color: AppColors.onPrimary)
-                      : null,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
+          // Priority ribbon
+          PriorityRibbon(priority: task.priority, scale: 1.5),
+          const SizedBox(height: 20),
+
+          // Task card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.cardWhite,
+              borderRadius: BorderRadius.circular(AppTokens.radiusXl),
+              boxShadow: AppTokens.shadowCardWhite,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   task.title,
-                  style: GoogleFonts.getFont(
-                    AppTypography.displayFamily,
-                    fontSize: AppTypography.headlineSize,
-                    fontWeight: FontWeight(AppTypography.headlineWeight),
-                    letterSpacing: AppTypography.headlineLetterSpacing,
-                    color: task.isCompleted ? AppColors.inkSubtle : AppColors.ink,
-                    decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                  style: AppTypography.display(size: 22, weight: 700, color: AppColors.ink),
+                ),
+                if (task.description != null && task.description!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    task.description!,
+                    style: AppTypography.body(size: AppTypography.bodySize, weight: AppTypography.bodyWeight, color: AppColors.inkMuted),
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _priorityColor().withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(9999),
-                ),
-                child: Text(
-                  task.priorityDisplay,
-                  style: GoogleFonts.getFont(
-                    AppTypography.bodyFamily,
-                    fontSize: AppTypography.bodySmSize,
-                    fontWeight: FontWeight(AppTypography.bodySmWeight),
-                    color: _priorityColor(),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              if (task.dueDate != null)
-                Row(
+                ],
+                const SizedBox(height: 20),
+                // Metadata chips
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    const Icon(Icons.schedule, size: 16, color: AppColors.inkSubtle),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${task.dueDate!.month}/${task.dueDate!.day}/${task.dueDate!.year}',
-                      style: GoogleFonts.getFont(
-                        AppTypography.bodyFamily,
-                        fontSize: AppTypography.bodySmSize,
-                        fontWeight: FontWeight(AppTypography.bodySmWeight),
-                        color: AppColors.inkSubtle,
-                      ),
-                    ),
+                    if (task.dueDate != null)
+                      _MetaChip(icon: Icons.calendar_today_rounded, label: _formatDate(task.dueDate!)),
+                    _MetaChip(icon: Icons.access_time_rounded, label: _formatDate(task.createdAt)),
                   ],
                 ),
-            ],
+              ],
+            ),
           ),
-          if (task.description != null && task.description!.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            Text(
-              task.description!,
-              style: GoogleFonts.getFont(
-                AppTypography.bodyFamily,
-                fontSize: AppTypography.bodySize,
-                fontWeight: FontWeight(AppTypography.bodyWeight),
-                color: AppColors.inkMuted,
+
+          const SizedBox(height: 32),
+
+          // Actions
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () async {
+                AppHaptics.mediumImpact();
+                try {
+                  await controller.toggleCompletion(task);
+                  if (context.mounted) context.pop();
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: task.isCompleted ? AppColors.blockSage : AppColors.accent,
+                foregroundColor: task.isCompleted ? AppColors.blockSageText : AppColors.accentInk,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTokens.radiusPill)),
+                elevation: 0,
+              ),
+              child: Text(
+                task.isCompleted ? 'Mark incomplete' : 'Mark complete',
+                style: AppTypography.body(size: AppTypography.buttonSize, weight: AppTypography.buttonWeight),
               ),
             ),
-          ],
-          const SizedBox(height: 32),
-          Text(
-            'Created ${task.createdAt.month}/${task.createdAt.day}/${task.createdAt.year}',
-            style: GoogleFonts.getFont(
-              AppTypography.bodyFamily,
-              fontSize: AppTypography.captionSize,
-              fontWeight: FontWeight(AppTypography.captionWeight),
-              letterSpacing: AppTypography.captionLetterSpacing,
-              color: AppColors.inkSubtle,
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: GestureDetector(
+              onTap: () async {
+                AppHaptics.mediumImpact();
+                try {
+                  await controller.deleteTask(task.id);
+                  if (context.mounted) context.pop();
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+                  }
+                }
+              },
+              child: Text(
+                'Delete task',
+                style: AppTypography.body(size: 14, weight: 500, color: AppColors.error),
+              ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.month}/${date.day}/${date.year}';
+  }
+}
+
+class _MetaChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _MetaChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.canvas,
+        borderRadius: BorderRadius.circular(AppTokens.radiusPill),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppColors.inkMuted),
+          const SizedBox(width: 4),
+          Text(label, style: AppTypography.body(size: 12, weight: 500, color: AppColors.inkMuted)),
         ],
       ),
     );

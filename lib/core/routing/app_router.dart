@@ -12,7 +12,9 @@ import 'package:axis/features/tasks/presentation/screens/dashboard_screen.dart';
 import 'package:axis/features/tasks/presentation/screens/task_detail_screen.dart';
 import 'package:axis/features/tasks/presentation/screens/task_form_screen.dart';
 import 'package:axis/profile/presentation/screens/profile_screen.dart';
+import 'package:axis/features/settings/presentation/screens/settings_screen.dart';
 import 'package:axis/features/auth/application/auth_controller.dart';
+import 'package:axis/features/onboarding/presentation/screens/onboarding_screen.dart';
 
 class AppRouter {
   final WidgetRef ref;
@@ -32,16 +34,19 @@ class AppRouter {
           state.matchedLocation.startsWith('/forgot-password') ||
           state.matchedLocation == '/splash';
 
-      if (!isAuthenticated && !isAuthRoute) {
+      final isOnboardingRoute = state.matchedLocation == '/onboarding';
+
+      if (!isAuthenticated && !isAuthRoute && !isOnboardingRoute) {
         return '/login';
       }
-      if (isAuthenticated && isAuthRoute && state.matchedLocation != '/splash') {
+      if (isAuthenticated && isAuthRoute) {
         return '/dashboard';
       }
       return null;
     },
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
+      GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
       GoRoute(path: '/forgot-password', builder: (_, __) => const ForgotPasswordScreen()),
@@ -50,6 +55,7 @@ class AppRouter {
       GoRoute(path: '/task/:id', builder: (_, state) => TaskDetailScreen(taskId: state.pathParameters['id']!)),
       GoRoute(path: '/task/edit/:id', builder: (_, state) => TaskFormScreen(taskId: state.pathParameters['id'])),
       GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+      GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
     ],
   );
 }

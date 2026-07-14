@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/task.dart';
 import '../domain/task_priority.dart';
-import '../data/task_repository.dart';
+import '../domain/task_filter.dart';
 import 'task_providers.dart';
 
 class TaskController {

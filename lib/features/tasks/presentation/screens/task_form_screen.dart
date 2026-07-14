@@ -1,26 +1,19 @@
+// Task Form — create or edit task
 // ignore_for_file: prefer_const_constructors, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'package:axis/core/theme/app_colors.dart';
 import 'package:axis/core/theme/app_tokens.dart';
 import 'package:axis/core/theme/app_typography.dart';
-import 'package:axis/core/widgets/primary_button.dart';
-import 'package:axis/core/widgets/app_text_field.dart';
 import 'package:axis/core/utils/validators.dart';
-import 'package:axis/core/widgets/app_snackbar.dart';
-import 'package:axis/features/tasks/application/task_providers.dart';
+import 'package:axis/core/utils/haptics.dart';
 import 'package:axis/features/tasks/application/task_controller.dart';
+import 'package:axis/features/tasks/application/task_providers.dart';
 import 'package:axis/features/tasks/domain/task_priority.dart';
-import 'package:axis/features/tasks/presentation/widgets/priority_chip_selector.dart';
-import 'package:axis/features/tasks/presentation/widgets/due_date_picker_field.dart';
 
 class TaskFormScreen extends ConsumerStatefulWidget {
   final String? taskId;
-
   const TaskFormScreen({super.key, this.taskId});
 
   @override
@@ -34,30 +27,37 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   TaskPriority _priority = TaskPriority.medium;
   DateTime? _dueDate;
   bool _isLoading = false;
-  bool _hasChanges = false;
+  bool _isEdit = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    if (widget.taskId != null) {
-      _loadTask();
+    _isEdit = widget.taskId != null;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isEdit && !_isInitialized) {
+      _loadExistingTask();
     }
-    _titleController.addListener(_onFieldChanged);
-    _descriptionController.addListener(_onFieldChanged);
   }
 
-  void _onFieldChanged() {
-    if (!_hasChanges) setState(() => _hasChanges = true);
-  }
-
-  Future<void> _loadTask() async {
-    final task = await ref.read(taskDetailProvider(widget.taskId!).future);
-    _titleController.text = task.title;
-    _descriptionController.text = task.description ?? '';
-    _priority = task.priority;
-    _dueDate = task.dueDate;
-    _hasChanges = false;
-    setState(() {});
+  void _loadExistingTask() {
+    final tasksAsync = ref.read(taskListProvider);
+    tasksAsync.whenData((tasks) {
+      final task = tasks.where((t) => t.id == widget.taskId).firstOrNull;
+      if (task != null && mounted) {
+        setState(() {
+          _titleController.text = task.title;
+          _descriptionController.text = task.description ?? '';
+          _priority = task.priority;
+          _dueDate = task.dueDate;
+          _isInitialized = true;
+        });
+      }
+    });
   }
 
   @override
@@ -67,84 +67,26 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     super.dispose();
   }
 
-  Future<bool> _onWillPop() async {
-    if (!_hasChanges) return true;
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface2,
-        title: Text(
-          'Discard changes?',
-          style: GoogleFonts.getFont(
-            AppTypography.displayFamily,
-            fontSize: AppTypography.headlineSize,
-            fontWeight: FontWeight(AppTypography.headlineWeight),
-            letterSpacing: AppTypography.headlineLetterSpacing,
-            color: AppColors.ink,
-          ),
-        ),
-        content: Text(
-          'You have unsaved changes.',
-          style: GoogleFonts.getFont(
-            AppTypography.bodyFamily,
-            fontSize: AppTypography.bodySize,
-            fontWeight: FontWeight(AppTypography.bodyWeight),
-            color: AppColors.inkMuted,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(
-              'Keep Editing',
-              style: GoogleFonts.getFont(
-                AppTypography.bodyFamily,
-                fontSize: AppTypography.buttonSize,
-                fontWeight: FontWeight(AppTypography.buttonWeight),
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: AppColors.onPrimary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTokens.radiusMd)),
-            ),
-            child: Text(
-              'Discard',
-              style: GoogleFonts.getFont(
-                AppTypography.bodyFamily,
-                fontSize: AppTypography.buttonSize,
-                fontWeight: FontWeight(AppTypography.buttonWeight),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-    return result ?? false;
-  }
-
-  Future<void> _save() async {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
     try {
       final controller = ref.read(taskControllerProvider);
-
-      if (widget.taskId != null) {
-        final existing = await ref.read(taskDetailProvider(widget.taskId!).future);
-        await controller.updateTask(existing.copyWith(
-          title: _titleController.text.trim(),
-          description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
-          priority: _priority,
-          dueDate: _dueDate,
-          updatedAt: DateTime.now(),
-        ));
-        AppSnackbar.show(context, 'Task updated', type: SnackBarType.success);
+      if (_isEdit) {
+        final tasksAsync = ref.read(taskListProvider);
+        tasksAsync.whenData((tasks) async {
+          final existing = tasks.where((t) => t.id == widget.taskId).firstOrNull;
+          if (existing != null) {
+            final updated = existing.copyWith(
+              title: _titleController.text.trim(),
+              description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+              priority: _priority,
+              dueDate: _dueDate,
+            );
+            await controller.updateTask(updated);
+            if (mounted) context.pop();
+          }
+        });
       } else {
         await controller.createTask(
           title: _titleController.text.trim(),
@@ -152,12 +94,12 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           priority: _priority,
           dueDate: _dueDate,
         );
-        AppSnackbar.show(context, 'Task created', type: SnackBarType.success);
+        if (mounted) context.pop();
       }
-
-      if (mounted) context.pop();
     } catch (e) {
-      AppSnackbar.show(context, 'Failed to save task: $e', type: SnackBarType.error);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -165,88 +107,129 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: !_hasChanges,
-      onPopInvokedWithResult: (didPop, _) async {
-        if (!didPop) {
-          final shouldPop = await _onWillPop();
-          if (shouldPop && context.mounted) context.pop();
-        }
-      },
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: AppColors.canvas,
+      appBar: AppBar(
         backgroundColor: AppColors.canvas,
-        appBar: AppBar(
-          backgroundColor: AppColors.canvas,
-          foregroundColor: AppColors.ink,
-          elevation: 0,
-          title: Text(
-            widget.taskId != null ? 'Edit Task' : 'New Task',
-            style: GoogleFonts.getFont(
-              AppTypography.bodyFamily,
-              fontSize: AppTypography.cardTitleSize,
-              fontWeight: FontWeight(AppTypography.cardTitleWeight),
-              color: AppColors.ink,
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () async {
-              if (_hasChanges) {
-                final shouldPop = await _onWillPop();
-                if (shouldPop && context.mounted) context.pop();
-              } else {
-                context.pop();
-              }
-            },
-          ),
+        foregroundColor: AppColors.ink,
+        elevation: 0,
+        title: Text(
+          _isEdit ? 'Edit Task' : 'New Task',
+          style: AppTypography.display(size: 20, weight: 700, color: AppColors.ink),
         ),
-        body: SingleChildScrollView(
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                AppTextField(
-                  label: 'Title',
-                  hintText: 'What needs to be done?',
+                // Title field
+                TextFormField(
                   controller: _titleController,
                   validator: Validators.validateTaskTitle,
+                  style: AppTypography.body(size: 15, weight: 400, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    hintText: 'Task title',
+                    hintStyle: AppTypography.body(size: 15, weight: 400, color: AppColors.inkMuted),
+                    filled: true,
+                    fillColor: AppColors.cardWhite,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTokens.radiusMd), borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Description
+                TextFormField(
+                  controller: _descriptionController,
+                  maxLines: 3,
+                  style: AppTypography.body(size: 14, weight: 400, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    hintText: 'Description (optional)',
+                    hintStyle: AppTypography.body(size: 14, weight: 400, color: AppColors.inkMuted),
+                    filled: true,
+                    fillColor: AppColors.cardWhite,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTokens.radiusMd), borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  ),
                 ),
                 const SizedBox(height: 16),
-                AppTextField(
-                  label: 'Description',
-                  hintText: 'Add details (optional)',
-                  controller: _descriptionController,
-                  maxLines: 4,
-                  maxLength: 500,
+                // Priority
+                Text('Priority', style: AppTypography.body(size: 13, weight: 600, color: AppColors.inkMuted)),
+                const SizedBox(height: 8),
+                Row(
+                  children: TaskPriority.values.map((p) {
+                    final isSelected = p == _priority;
+                    final (bg, text, label) = switch (p) {
+                      TaskPriority.low => (AppColors.blockSage, AppColors.blockSageText, 'Low'),
+                      TaskPriority.medium => (AppColors.accent, AppColors.accentInk, 'Medium'),
+                      TaskPriority.high => (AppColors.blockCoral, AppColors.blockCoralText, 'High'),
+                    };
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () { AppHaptics.selectionClick(); setState(() => _priority = p); },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: bg.withOpacity(isSelected ? 1.0 : 0.6),
+                            borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+                            border: isSelected ? Border.all(color: AppColors.accent, width: 2) : null,
+                          ),
+                          child: Text(label, textAlign: TextAlign.center, style: AppTypography.body(size: 13, weight: 600, color: text)),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                // Due date
+                GestureDetector(
+                  onTap: () async {
+                    final date = await showDatePicker(context: context, initialDate: _dueDate ?? DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(const Duration(days: 365)));
+                    if (date != null) setState(() => _dueDate = date);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardWhite,
+                      borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.inkMuted),
+                        const SizedBox(width: 10),
+                        Text(
+                          _dueDate != null ? '${_dueDate!.month}/${_dueDate!.day}/${_dueDate!.year}' : 'Set due date (optional)',
+                          style: AppTypography.body(size: 14, weight: 400, color: _dueDate != null ? AppColors.ink : AppColors.inkMuted),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 24),
-                PriorityChipSelector(
-                  selectedPriority: _priority,
-                  onChanged: (p) {
-                    setState(() {
-                      _priority = p;
-                      _hasChanges = true;
-                    });
-                  },
+                // Cancel + Submit
+                GestureDetector(
+                  onTap: () => context.pop(),
+                  child: Text('Cancel', textAlign: TextAlign.center, style: AppTypography.body(size: 14, weight: 500, color: AppColors.inkMuted)),
                 ),
-                const SizedBox(height: 24),
-                DueDatePickerField(
-                  selectedDate: _dueDate,
-                  onDateSelected: (date) {
-                    setState(() {
-                      _dueDate = date;
-                      _hasChanges = true;
-                    });
-                  },
-                ),
-                const SizedBox(height: 32),
-                PrimaryButton(
-                  text: widget.taskId != null ? 'Update Task' : 'Create Task',
-                  onPressed: _save,
-                  isLoading: _isLoading,
-                  isFullWidth: true,
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: AppColors.accentInk,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTokens.radiusPill)),
+                      elevation: 0,
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(AppColors.accentInk)))
+                        : Text(_isEdit ? 'Save Changes' : 'Create Task', style: AppTypography.body(size: AppTypography.buttonSize, weight: AppTypography.buttonWeight, color: AppColors.accentInk)),
+                  ),
                 ),
               ],
             ),

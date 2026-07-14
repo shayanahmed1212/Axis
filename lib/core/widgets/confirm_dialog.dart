@@ -51,15 +51,14 @@ class ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.surface2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTokens.radiusXl)),
+      backgroundColor: AppColors.cardWhite,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTokens.radiusLg)),
       title: Text(
         title,
         style: GoogleFonts.getFont(
           AppTypography.displayFamily,
-          fontSize: AppTypography.headlineSize,
-          fontWeight: FontWeight(AppTypography.headlineWeight),
-          letterSpacing: AppTypography.headlineLetterSpacing,
+          fontSize: AppTypography.sectionHeaderSize,
+          fontWeight: FontWeight(AppTypography.sectionHeaderWeight),
           color: AppColors.ink,
         ),
       ),
@@ -81,7 +80,7 @@ class ConfirmDialog extends StatelessWidget {
               AppTypography.bodyFamily,
               fontSize: AppTypography.buttonSize,
               fontWeight: FontWeight(AppTypography.buttonWeight),
-              color: AppColors.inkSubtle,
+              color: AppColors.inkMuted,
             ),
           ),
         ),
@@ -89,8 +88,8 @@ class ConfirmDialog extends StatelessWidget {
           onPressed: onConfirm,
           style: ElevatedButton.styleFrom(
             backgroundColor: confirmColor ?? AppColors.error,
-            foregroundColor: AppColors.onPrimary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTokens.radiusMd)),
+            foregroundColor: AppColors.cardWhite,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTokens.radiusPill)),
           ),
           child: Text(
             confirmLabel,

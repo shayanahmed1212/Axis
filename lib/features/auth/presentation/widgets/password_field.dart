@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:axis/core/theme/app_colors.dart';
 import 'package:axis/core/theme/app_tokens.dart';
 import 'package:axis/core/theme/app_typography.dart';
-import 'package:axis/core/utils/validators.dart';
 
 class PasswordField extends StatefulWidget {
   final TextEditingController? controller;
@@ -32,8 +31,8 @@ class _PasswordFieldState extends State<PasswordField> {
             'Password',
             style: GoogleFonts.getFont(
               AppTypography.bodyFamily,
-              fontSize: AppTypography.bodySize,
-              fontWeight: FontWeight(AppTypography.bodyWeight),
+                fontSize: AppTypography.captionSize,
+                fontWeight: FontWeight(AppTypography.captionWeight),
               color: AppColors.inkMuted,
             ),
           ),
@@ -41,7 +40,7 @@ class _PasswordFieldState extends State<PasswordField> {
         TextFormField(
           controller: widget.controller,
           obscureText: _obscured,
-          validator: widget.validator ?? Validators.validatePassword,
+          validator: widget.validator,
           style: GoogleFonts.getFont(
             AppTypography.bodyFamily,
             fontSize: AppTypography.bodySize,
@@ -54,31 +53,35 @@ class _PasswordFieldState extends State<PasswordField> {
               AppTypography.bodyFamily,
               fontSize: AppTypography.bodySize,
               fontWeight: FontWeight(AppTypography.bodyWeight),
-              color: AppColors.inkSubtle,
+              color: AppColors.inkMuted,
             ),
             suffixIcon: IconButton(
-              icon: Icon(_obscured ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppColors.inkSubtle),
+              icon: Icon(
+                _obscured ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                color: AppColors.inkMuted,
+                size: 20,
+              ),
               onPressed: () => setState(() => _obscured = !_obscured),
             ),
             filled: true,
-            fillColor: AppColors.surface1,
+            fillColor: AppColors.canvas,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.hairline, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.hairline, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+              borderSide: const BorderSide(color: AppColors.accent, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.error, width: 1),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 12),
           ),
         ),
       ],
