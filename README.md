@@ -1,6 +1,6 @@
-# Flow — A Flutter To-Do App
+# Axis — A Flutter To-Do App
 
-A production-grade Flutter to-do list application called **"Flow"** (a task manager built for focus and momentum). Built as a one-week individual internship assessment submission — 100% original, fully functional, demonstrating professional engineering discipline.
+A production-grade Flutter to-do list application called **"Axis"** (a task manager built for focus and momentum). Built as a one-week individual internship assessment submission — 100% original, fully functional, demonstrating professional engineering discipline.
 
 Dark mode-first design with a custom "Flow Dark" design system implemented entirely in Dart code (no UI kits, no templates).
 
