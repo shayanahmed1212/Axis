@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "876781984559",
+    "project_id": "fir-xs-292e1",
+    "storage_bucket": "fir-xs-292e1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:876781984559:android:f3c758c408609a32899fda",
+        "android_client_info": {
+          "package_name": "com.shayan.axis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGTREbJ17CEL853Dl8VmbU07OGaKdgtZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
