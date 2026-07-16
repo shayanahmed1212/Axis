@@ -13,18 +13,23 @@ class SplashScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(authStateProvider, (prev, next) {
-      next.whenData((user) {
-        if (user != null) {
-          final onboardingComplete = ref.read(onboardingCompleteProvider);
-          if (onboardingComplete) {
-            context.go('/dashboard');
+      next.when(
+        data: (user) {
+          if (user != null) {
+            final onboardingComplete = ref.read(onboardingCompleteProvider);
+            context.go(onboardingComplete ? '/dashboard' : '/onboarding');
           } else {
-            context.go('/onboarding');
+            context.go('/login');
           }
-        } else {
+        },
+        error: (e, _) {
+          // Don't strand the user on a silent black screen forever if the
+          // auth stream errors — fall back to login, which is always a
+          // safe destination and lets them retry the action that failed.
           context.go('/login');
-        }
-      });
+        },
+        loading: () {}, // still initializing — wait for the next event
+      );
     });
 
     return Scaffold(

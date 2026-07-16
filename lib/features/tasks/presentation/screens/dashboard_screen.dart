@@ -11,6 +11,8 @@ import 'package:axis/core/widgets/bento_stat_card.dart';
 import 'package:axis/core/widgets/task_ribbon_card.dart';
 import 'package:axis/core/widgets/segmented_filter.dart';
 import 'package:axis/core/widgets/app_snackbar.dart';
+import 'package:axis/core/widgets/app_error_state.dart';
+import 'package:axis/core/errors/app_exception.dart';
 import 'package:axis/features/tasks/application/task_providers.dart';
 import 'package:axis/features/tasks/application/task_controller.dart';
 import 'package:axis/features/tasks/domain/task.dart';
@@ -60,7 +62,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         bottom: false,
         child: tasksAsync.when(
           loading: () => const Center(child: CircularProgressIndicator(color: AppColors.accent)),
-          error: (e, _) => Center(child: Text('Error: $e')),
+          error: (e, _) => AppErrorState(
+            message: e is AppException ? e.message : 'Something went wrong. Please try again.',
+            onRetry: () => ref.invalidate(taskListProvider),
+          ),
           data: (tasks) => _buildContent(tasks, controller),
         ),
       ),

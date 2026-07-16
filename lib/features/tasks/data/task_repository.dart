@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -49,6 +51,10 @@ class TaskRepository {
     }
   }
 
+  /// Streams the user's tasks. Any FirebaseException from the underlying
+  /// snapshot stream (e.g. a transient permission-denied right after
+  /// registration/login) is now mapped to a typed AppException before it
+  /// reaches the UI, instead of leaking the raw Firebase error object.
   Stream<List<Task>> watchTasks({TaskFilter? filter}) {
     Query<Map<String, dynamic>> query = _tasksCollection.orderBy('created_at', descending: true);
 
@@ -63,9 +69,20 @@ class TaskRepository {
       }
     }
 
-    return query.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList();
-    });
+    return query.snapshots().transform(
+      StreamTransformer<QuerySnapshot<Map<String, dynamic>>, List<Task>>.fromHandlers(
+        handleData: (snapshot, sink) {
+          sink.add(snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList());
+        },
+        handleError: (error, stackTrace, sink) {
+          if (error is FirebaseException) {
+            sink.addError(_mapError(error), stackTrace);
+          } else {
+            sink.addError(error, stackTrace);
+          }
+        },
+      ),
+    );
   }
 
   Future<Task> updateTask(Task task) async {
@@ -110,4 +127,3 @@ class TaskRepository {
     }
   }
 }
-
