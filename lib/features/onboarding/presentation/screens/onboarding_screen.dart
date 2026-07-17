@@ -1,10 +1,7 @@
-// Onboarding — block color hero panels, accent dots, Sora titles
-// ignore_for_file: prefer_const_constructors
-
+// Onboarding Carousel — Uses provided illustration PNGs from assets/images/onboarding/
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:axis/core/config/settings_providers.dart';
 import 'package:axis/core/theme/app_colors.dart';
@@ -29,7 +26,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Future<void> _completeOnboarding() async {
     await ref.read(onboardingCompleteProvider.notifier).complete();
-    if (mounted) context.go('/dashboard');
+    if (mounted) context.go('/login');
   }
 
   void _skip() {
@@ -49,9 +46,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final reduceMotion = MediaQuery.of(context).disableAnimations;
+    final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: AppColors.canvasDark,
       body: Stack(
         children: [
           PageView.builder(
@@ -62,25 +60,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ? const NeverScrollableScrollPhysics()
                 : const BouncingScrollPhysics(),
             itemBuilder: (context, index) {
-              return _OnboardingPage(index: index);
+              return _OnboardingPage(
+                index: index,
+                currentPage: _currentPage,
+              );
             },
           ),
 
-          // Skip button
+          // Skip button — top-left
           Positioned(
-            top: MediaQuery.of(context).padding.top + AppTokens.xs,
-            right: AppTokens.lg,
+            top: topPadding + AppTokens.xs,
+            left: AppTokens.lg,
             child: Pressable(
               onTap: _skip,
               child: Padding(
                 padding: const EdgeInsets.all(AppTokens.xs),
                 child: Text(
-                  'Skip',
-                  style: GoogleFonts.inter(
-                    fontSize: AppTypography.captionSize,
-                    fontWeight: FontWeight(AppTypography.captionWeight),
-                    color: AppColors.inkMuted,
-                  ),
+                  'SKIP',
+                  style: AppTypography.meta(color: AppColors.inkMuted),
                 ),
               ),
             ),
@@ -93,38 +90,40 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             bottom: 0,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppTokens.lg,
-                  vertical: AppTokens.xxl,
+                padding: const EdgeInsets.fromLTRB(
+                  AppTokens.lg,
+                  0,
+                  AppTokens.lg,
+                  AppTokens.xxl,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                child: Row(
                   children: [
-                    // Page dots — accent when active
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(3, (index) {
-                        final isActive = index == _currentPage;
-                        return AnimatedContainer(
-                          duration: reduceMotion
-                              ? Duration.zero
-                              : const Duration(milliseconds: AppTokens.durationNormal),
-                          margin: const EdgeInsets.symmetric(horizontal: AppTokens.xxs),
-                          width: isActive ? 24 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: isActive ? AppColors.accent : AppColors.hairline,
-                            borderRadius: BorderRadius.circular(AppTokens.radiusPill),
+                    // BACK button — hidden on first slide
+                    if (_currentPage > 0)
+                      Pressable(
+                        onTap: () {
+                          _pageController.previousPage(
+                            duration: reduceMotion
+                                ? Duration.zero
+                                : const Duration(milliseconds: AppTokens.durationSlow),
+                            curve: Curves.easeOut,
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: AppTokens.sm, horizontal: AppTokens.sm),
+                          child: Text(
+                            'BACK',
+                            style: AppTypography.buttonLabel(color: AppColors.inkMuted),
                           ),
-                        );
-                      }),
-                    ),
+                        ),
+                      )
+                    else
+                      const SizedBox(width: 60),
 
-                    const SizedBox(height: AppTokens.xxl),
+                    const Spacer(),
 
-                    // Action button
+                    // NEXT / GET STARTED button
                     SizedBox(
-                      width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
                         onPressed: _currentPage < 2
@@ -137,19 +136,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                 );
                               }
                             : _completeOnboarding,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.accent,
-                          foregroundColor: AppColors.accentInk,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppTokens.radiusPill),
-                          ),
-                        ),
                         child: Text(
-                          _currentPage < 2 ? 'Continue' : 'Get Started',
-                          style: GoogleFonts.inter(
-                            fontSize: AppTypography.buttonSize,
-                            fontWeight: FontWeight(AppTypography.buttonWeight),
-                          ),
+                          _currentPage < 2 ? 'NEXT' : 'GET STARTED',
                         ),
                       ),
                     ),
@@ -166,91 +154,101 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
 class _OnboardingPage extends StatelessWidget {
   final int index;
-  const _OnboardingPage({required this.index});
+  final int currentPage;
+  const _OnboardingPage({required this.index, required this.currentPage});
 
   @override
   Widget build(BuildContext context) {
-    final IconData icon;
+    final String imagePath;
     final String title;
     final String subtitle;
-    final Color bgColor;
-    final Color textColor;
 
     switch (index) {
       case 0:
-        icon = Icons.check_circle_outline_rounded;
+        imagePath = 'assets/images/onboarding/onboarding_1.png';
         title = 'Welcome to Axis';
-        subtitle = 'Organize your tasks with clarity';
-        bgColor = AppColors.blockLavender;
-        textColor = AppColors.blockLavenderText;
+        subtitle = 'Organize your life with clarity and focus';
         break;
       case 1:
-        icon = Icons.trending_up_rounded;
+        imagePath = 'assets/images/onboarding/onboarding_2.png';
         title = 'Stay Focused';
-        subtitle = 'Track priorities and deadlines';
-        bgColor = AppColors.blockSage;
-        textColor = AppColors.blockSageText;
+        subtitle = 'Track priorities, deadlines, and progress';
         break;
       case 2:
-        icon = Icons.shield_outlined;
+        imagePath = 'assets/images/onboarding/onboarding_3.png';
         title = 'Your Data, Your Control';
         subtitle = 'Private, secure, and always in sync';
-        bgColor = AppColors.blockSky;
-        textColor = AppColors.blockSkyText;
         break;
       default:
-        icon = Icons.check_circle_outline_rounded;
+        imagePath = 'assets/images/onboarding/onboarding_1.png';
         title = '';
         subtitle = '';
-        bgColor = AppColors.blockLavender;
-        textColor = AppColors.blockLavenderText;
     }
 
     return Container(
-      color: AppColors.canvas,
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppTokens.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Block color hero card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppTokens.xxl),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(AppTokens.radiusXl),
-                ),
-                child: Column(
-                  children: [
-                    Icon(icon, size: 64, color: textColor),
-                    const SizedBox(height: AppTokens.lg),
-                    Text(
-                      title,
-                      style: GoogleFonts.sora(
-                        fontSize: AppTypography.screenTitleSize,
-                        fontWeight: FontWeight(AppTypography.screenTitleWeight),
-                        letterSpacing: AppTypography.screenTitleTracking,
-                        color: textColor,
-                      ),
-                    ),
-                    const SizedBox(height: AppTokens.sm),
-                    Text(
-                      subtitle,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: AppTypography.bodySize,
-                        fontWeight: FontWeight(AppTypography.bodyWeight),
-                        color: textColor.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
+      color: AppColors.canvasDark,
+      child: Column(
+        children: [
+          // Illustration — upper ~55%
+          Expanded(
+            flex: 6,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppTokens.lg),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.contain,
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+
+          // Dot indicator
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppTokens.xl),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (i) {
+                final isActive = i == index;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: AppTokens.durationNormal),
+                  margin: const EdgeInsets.symmetric(horizontal: AppTokens.xxs),
+                  width: isActive ? 24 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: isActive ? AppColors.primary : AppColors.hairline,
+                    borderRadius: BorderRadius.circular(AppTokens.radiusPill),
+                  ),
+                );
+              }),
+            ),
+          ),
+
+          // Headline
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppTokens.lg),
+            child: Text(
+              title,
+              style: AppTypography.onboardingHeadline(color: AppColors.ink),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+          const SizedBox(height: AppTokens.sm),
+
+          // Subtitle
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppTokens.lg),
+            child: Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: AppTypography.body(color: AppColors.inkMuted),
+            ),
+          ),
+
+          // Bottom spacer for controls
+          const SizedBox(height: 120),
+        ],
       ),
     );
   }

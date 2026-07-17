@@ -1,3 +1,4 @@
+// Task model — Updated with category, priority 1-10, subtasks, reminder
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -12,8 +13,11 @@ abstract class Task with _$Task {
     required String title,
     String? description,
     required bool isCompleted,
-    required TaskPriority priority,
+    @Default(5) int priority, // 1-10 scale
+    String? categoryId,
     DateTime? dueDate,
+    DateTime? reminderAt,
+    @Default([]) List<SubTask> subtasks,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _Task;
@@ -25,8 +29,11 @@ abstract class Task with _$Task {
     title: '',
     description: null,
     isCompleted: false,
-    priority: TaskPriority.low,
+    priority: 5,
+    categoryId: null,
     dueDate: null,
+    reminderAt: null,
+    subtasks: [],
     createdAt: DateTime(2024),
     updatedAt: DateTime(2024),
   );
@@ -36,33 +43,68 @@ abstract class Task with _$Task {
       'title': title,
       'description': description,
       'is_completed': isCompleted,
-      'priority': priority.name,
+      'priority': priority,
+      'category_id': categoryId,
       'due_date': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
+      'reminder_at': reminderAt != null ? Timestamp.fromDate(reminderAt!) : null,
+      'subtasks': subtasks.map((s) => s.toMap()).toList(),
       'created_at': Timestamp.fromDate(createdAt),
       'updated_at': Timestamp.fromDate(updatedAt),
     };
   }
 
-  static Task fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory Task.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
     return Task(
       id: doc.id,
       title: data['title'] as String? ?? '',
       description: data['description'] as String?,
       isCompleted: data['is_completed'] as bool? ?? false,
-      priority: TaskPriority.values.firstWhere(
-        (p) => p.name == data['priority'],
-        orElse: () => TaskPriority.medium,
-      ),
+      priority: data['priority'] is String
+          ? int.tryParse(data['priority'] as String) ?? 5
+          : data['priority'] as int? ?? 5,
+      categoryId: data['category_id'] as String?,
       dueDate: data['due_date'] != null ? (data['due_date'] as Timestamp).toDate() : null,
+      reminderAt: data['reminder_at'] != null ? (data['reminder_at'] as Timestamp).toDate() : null,
+      subtasks: (data['subtasks'] as List<dynamic>?)
+              ?.map((e) => SubTask.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       createdAt: (data['created_at'] as Timestamp).toDate(),
       updatedAt: (data['updated_at'] as Timestamp).toDate(),
     );
   }
 
-  String get priorityDisplay => switch (priority) {
-    TaskPriority.low => 'Low',
-    TaskPriority.medium => 'Medium',
-    TaskPriority.high => 'High',
-  };
+  TaskPriority get priorityEnum => TaskPriority.fromInt(priority);
+
+  int get completedSubtasksCount => subtasks.where((s) => s.isCompleted).length;
+  int get totalSubtasksCount => subtasks.length;
+  double get subtaskProgress => totalSubtasksCount > 0 ? completedSubtasksCount / totalSubtasksCount : 0.0;
+}
+
+@freezed
+abstract class SubTask with _$SubTask {
+  const factory SubTask({
+    required String id,
+    required String title,
+    required bool isCompleted,
+  }) = _SubTask;
+
+  const SubTask._();
+
+  factory SubTask.fromMap(Map<String, dynamic> map) {
+    return SubTask(
+      id: map['id'] as String? ?? '',
+      title: map['title'] as String? ?? '',
+      isCompleted: map['is_completed'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'is_completed': isCompleted,
+    };
+  }
 }

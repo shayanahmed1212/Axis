@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:axis/core/theme/app_colors.dart';
 import 'package:axis/core/theme/app_tokens.dart';
@@ -31,18 +30,13 @@ class AuthErrorBanner extends StatelessWidget {
           Expanded(
             child: Text(
               message!,
-              style: GoogleFonts.getFont(
-                AppTypography.bodyFamily,
-                fontSize: AppTypography.captionSize,
-                fontWeight: FontWeight(AppTypography.captionWeight),
-                color: AppColors.error,
-              ),
+              style: AppTypography.body(color: AppColors.error),
             ),
           ),
           if (onDismiss != null)
             GestureDetector(
               onTap: onDismiss,
-              child: const Icon(Icons.close_rounded, color: AppColors.inkMuted, size: 16),
+              child: const Icon(Icons.close_rounded, color: AppColors.ink, size: 16),
             ),
         ],
       ),

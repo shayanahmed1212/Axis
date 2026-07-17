@@ -9,6 +9,7 @@ abstract class AppUser with _$AppUser {
     required String id,
     required String email,
     String? displayName,
+    String? photoURL,
     required DateTime createdAt,
   }) = _AppUser;
 
@@ -25,6 +26,7 @@ abstract class AppUser with _$AppUser {
     return {
       'email': email,
       'display_name': displayName,
+      'photo_url': photoURL,
       'created_at': Timestamp.fromDate(createdAt),
     };
   }
@@ -35,6 +37,7 @@ abstract class AppUser with _$AppUser {
       id: doc.id,
       email: data['email'] as String? ?? '',
       displayName: data['display_name'] as String?,
+      photoURL: data['photo_url'] as String?,
       createdAt: (data['created_at'] as Timestamp).toDate(),
     );
   }

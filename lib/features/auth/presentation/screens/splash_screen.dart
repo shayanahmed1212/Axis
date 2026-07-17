@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:axis/core/config/settings_providers.dart';
 import 'package:axis/core/theme/app_colors.dart';
+import 'package:axis/core/theme/app_tokens.dart';
 import 'package:axis/core/theme/app_typography.dart';
 import 'package:axis/features/auth/application/auth_controller.dart';
 
@@ -17,44 +18,43 @@ class SplashScreen extends ConsumerWidget {
         data: (user) {
           if (user != null) {
             final onboardingComplete = ref.read(onboardingCompleteProvider);
-            context.go(onboardingComplete ? '/dashboard' : '/onboarding');
+            context.go(onboardingComplete ? '/' : '/onboarding');
           } else {
             context.go('/login');
           }
         },
         error: (e, _) {
-          // Don't strand the user on a silent black screen forever if the
-          // auth stream errors — fall back to login, which is always a
-          // safe destination and lets them retry the action that failed.
           context.go('/login');
         },
-        loading: () {}, // still initializing — wait for the next event
+        loading: () {},
       );
     });
 
     return Scaffold(
-      backgroundColor: AppColors.blockBlack,
+      backgroundColor: AppColors.canvasDark,
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Axis',
-              style: AppTypography.display(
-                size: 40,
-                weight: 700,
-                letterSpacing: -0.01,
-                color: AppColors.inkOnDark,
+            // Logo mark: rounded-square outline + checkmark
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+                border: Border.all(color: AppColors.primary, width: 2.5),
+              ),
+              child: const Icon(
+                Icons.check_rounded,
+                color: AppColors.onPrimary,
+                size: 48,
               ),
             ),
-            const SizedBox(height: 16),
-            Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                color: AppColors.accent,
-                shape: BoxShape.circle,
-              ),
+            const SizedBox(height: AppTokens.md),
+            // Wordmark
+            Text(
+              'Axis',
+              style: AppTypography.onboardingHeadline(color: AppColors.ink),
             ),
           ],
         ),

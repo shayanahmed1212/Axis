@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:axis/core/theme/app_colors.dart';
 import 'package:axis/core/theme/app_tokens.dart';
@@ -29,42 +28,27 @@ class _PasswordFieldState extends State<PasswordField> {
           padding: const EdgeInsets.only(bottom: 8),
           child: Text(
             'Password',
-            style: GoogleFonts.getFont(
-              AppTypography.bodyFamily,
-                fontSize: AppTypography.captionSize,
-                fontWeight: FontWeight(AppTypography.captionWeight),
-              color: AppColors.inkMuted,
-            ),
+            style: AppTypography.meta(color: AppColors.ink),
           ),
         ),
         TextFormField(
           controller: widget.controller,
           obscureText: _obscured,
           validator: widget.validator,
-          style: GoogleFonts.getFont(
-            AppTypography.bodyFamily,
-            fontSize: AppTypography.bodySize,
-            fontWeight: FontWeight(AppTypography.bodyWeight),
-            color: AppColors.ink,
-          ),
+          style: AppTypography.body(color: AppColors.ink),
           decoration: InputDecoration(
             hintText: 'Enter password',
-            hintStyle: GoogleFonts.getFont(
-              AppTypography.bodyFamily,
-              fontSize: AppTypography.bodySize,
-              fontWeight: FontWeight(AppTypography.bodyWeight),
-              color: AppColors.inkMuted,
-            ),
+            hintStyle: AppTypography.body(color: AppColors.inkMuted),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscured ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                color: AppColors.inkMuted,
+                color: AppColors.ink,
                 size: 20,
               ),
               onPressed: () => setState(() => _obscured = !_obscured),
             ),
             filled: true,
-            fillColor: AppColors.canvas,
+            fillColor: AppColors.surfaceCard,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.hairline, width: 1),
@@ -75,7 +59,7 @@ class _PasswordFieldState extends State<PasswordField> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),
-              borderSide: const BorderSide(color: AppColors.accent, width: 2),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),

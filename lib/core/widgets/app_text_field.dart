@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_tokens.dart';
@@ -14,11 +13,14 @@ class AppTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool obscureText;
   final TextInputType keyboardType;
+  final TextInputAction? textInputAction;
+  final TextCapitalization textCapitalization;
   final int? maxLines;
   final int? maxLength;
   final Widget? suffixIcon;
   final Widget? prefixIcon;
   final FocusNode? focusNode;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const AppTextField({
     super.key,
@@ -28,11 +30,14 @@ class AppTextField extends StatelessWidget {
     this.validator,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
+    this.textInputAction,
+    this.textCapitalization = TextCapitalization.none,
     this.maxLines = 1,
     this.maxLength,
     this.suffixIcon,
     this.prefixIcon,
     this.focusNode,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -45,12 +50,7 @@ class AppTextField extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               label!,
-              style: GoogleFonts.getFont(
-                AppTypography.bodyFamily,
-                fontSize: AppTypography.captionSize,
-                fontWeight: FontWeight(AppTypography.captionWeight),
-                color: AppColors.inkMuted,
-              ),
+              style: AppTypography.meta(color: AppColors.ink),
             ),
           ),
         TextFormField(
@@ -58,26 +58,19 @@ class AppTextField extends StatelessWidget {
           focusNode: focusNode,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          textCapitalization: textCapitalization,
           maxLines: maxLines,
           maxLength: maxLength,
-          style: GoogleFonts.getFont(
-            AppTypography.bodyFamily,
-            fontSize: AppTypography.bodySize,
-            fontWeight: FontWeight(AppTypography.bodyWeight),
-            color: AppColors.ink,
-          ),
+          onFieldSubmitted: onFieldSubmitted,
+          style: AppTypography.body(color: AppColors.ink),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: GoogleFonts.getFont(
-              AppTypography.bodyFamily,
-              fontSize: AppTypography.bodySize,
-              fontWeight: FontWeight(AppTypography.bodyWeight),
-              color: AppColors.inkMuted,
-            ),
+            hintStyle: AppTypography.body(color: AppColors.inkMuted),
             suffixIcon: suffixIcon,
             prefixIcon: prefixIcon,
             filled: true,
-            fillColor: AppColors.canvas,
+            fillColor: AppColors.surfaceCard,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               borderSide: const BorderSide(color: AppColors.hairline, width: 1),
@@ -88,7 +81,7 @@ class AppTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),
-              borderSide: const BorderSide(color: AppColors.accent, width: 2),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),

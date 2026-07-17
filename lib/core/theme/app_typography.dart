@@ -1,81 +1,84 @@
-// Axis Typography — Sora for display, Inter for UI
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTypography {
-  // Display font — Sora for big numbers and screen titles
-  static const String displayFamily = 'Sora';
-  // Body font — Inter for everything else
-  static const String bodyFamily = 'Inter';
+  static const String fontFamily = 'Inter';
 
-  // Hero numeral — big stat card numbers
-  static const double heroNumeralSize = 40;
-  static const int heroNumeralWeight = 800;
-  static const double heroNumeralTracking = -0.02;
-
-  // Screen title
-  static const double screenTitleSize = 26;
+  // Onboarding headline — 22px / 700
+  static const double onboardingHeadlineSize = 22;
+  static const int onboardingHeadlineWeight = 700;
+  // Screen title ("Index", "Calendar") — 20px / 700
+  static const double screenTitleSize = 20;
   static const int screenTitleWeight = 700;
-  static const double screenTitleTracking = -0.01;
 
-  // Section header
-  static const double sectionHeaderSize = 18;
-  static const int sectionHeaderWeight = 700;
+  // Task title — 14px / 600
+  static const double taskTitleSize = 14;
+  static const int taskTitleWeight = 600;
 
-  // Card title (task title)
-  static const double cardTitleSize = 16;
-  static const int cardTitleWeight = 600;
-
-  // Body
+  // Body / field input text — 14px / 400
   static const double bodySize = 14;
   static const int bodyWeight = 400;
 
-  // Meta/caption
-  static const double captionSize = 12;
-  static const int captionWeight = 500;
-  static const double captionTracking = 0.01;
+  // Secondary / meta — 12px / 500
+  static const double metaSize = 12;
+  static const int metaWeight = 500;
 
-  // Ribbon tag text
-  static const double ribbonSize = 10;
-  static const int ribbonWeight = 700;
-  static const double ribbonTracking = 0.04;
-
-  // Button label
+  // Button label — 15px / 500
   static const double buttonSize = 15;
-  static const int buttonWeight = 600;
+  static const int buttonWeight = 500;
 
-  // Helper — get Sora TextStyle
-  static TextStyle display({
+  // Section label (e.g. "Settings", "Account") — 13px / 600
+  static const double sectionLabelSize = 13;
+  static const int sectionLabelWeight = 600;
+
+  static TextStyle onboardingHeadline({
     double? size,
     int? weight,
-    double? letterSpacing,
     Color? color,
   }) {
-    return GoogleFonts.sora(
-      fontSize: size ?? screenTitleSize,
-      fontWeight: FontWeight(weight ?? screenTitleWeight),
-      letterSpacing: letterSpacing ?? screenTitleTracking,
+    return GoogleFonts.inter(
+      fontSize: size ?? onboardingHeadlineSize,
+      fontWeight: FontWeight(weight ?? onboardingHeadlineWeight),
       color: color,
     );
   }
 
-  // ── Backward-compatible aliases (old Apple system → new bento) ──
-  static const double headlineSize = screenTitleSize;
-  static const int headlineWeight = screenTitleWeight;
-  static const double headlineLetterSpacing = screenTitleTracking;
-  static const double titleSize = sectionHeaderSize;
-  static const int titleWeight = sectionHeaderWeight;
-  static const double titleLetterSpacing = 0.0;
-  static const double bodySmSize = captionSize;
-  static const int bodySmWeight = captionWeight;
-  static const double bodyLetterSpacing = 0.0;
-  static const double buttonLetterSpacing = 0.0;
-  static const double captionLetterSpacing = captionTracking;
-  static const double displaySize = screenTitleSize;
-  static const int displayWeight = screenTitleWeight;
-  static const double displayLetterSpacing = screenTitleTracking;
+  static TextStyle screenTitle({
+    double? size,
+    int? weight,
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: size ?? screenTitleSize,
+      fontWeight: FontWeight(weight ?? screenTitleWeight),
+      color: color,
+    );
+  }
 
-  // Helper — get Inter TextStyle
+  static TextStyle taskTitle({
+    double? size,
+    int? weight,
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: size ?? taskTitleSize,
+      fontWeight: FontWeight(weight ?? taskTitleWeight),
+      color: color,
+    );
+  }
+
+  static TextStyle cardTitle({
+    double? size,
+    int? weight,
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: size ?? taskTitleSize,
+      fontWeight: FontWeight(weight ?? taskTitleWeight),
+      color: color,
+    );
+  }
+
   static TextStyle body({
     double? size,
     int? weight,
@@ -85,7 +88,55 @@ class AppTypography {
     return GoogleFonts.inter(
       fontSize: size ?? bodySize,
       fontWeight: FontWeight(weight ?? bodyWeight),
-      letterSpacing: letterSpacing,
+      letterSpacing: letterSpacing ?? 0,
+      color: color,
+    );
+  }
+
+  static TextStyle meta({
+    double? size,
+    int? weight,
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: size ?? metaSize,
+      fontWeight: FontWeight(weight ?? metaWeight),
+      color: color,
+    );
+  }
+
+  static TextStyle buttonLabel({
+    double? size,
+    int? weight,
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: size ?? buttonSize,
+      fontWeight: FontWeight(weight ?? buttonWeight),
+      color: color,
+    );
+  }
+
+  static TextStyle sectionLabel({
+    double? size,
+    int? weight,
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: size ?? sectionLabelSize,
+      fontWeight: FontWeight(weight ?? sectionLabelWeight),
+      color: color,
+    );
+  }
+
+  static TextStyle sheetTitle({
+    double? size,
+    int? weight,
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: size ?? 18,
+      fontWeight: FontWeight(weight ?? 600),
       color: color,
     );
   }

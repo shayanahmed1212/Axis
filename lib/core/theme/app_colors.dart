@@ -1,72 +1,52 @@
-// Axis Color System — Confident Color-Block Bento
-// Every card is a solid color block. Accent yellow is interactive-only.
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Canvas & neutrals
-  static const Color canvas = Color(0xFFF6F5F1);
-  static const Color surfaceDark = Color(0xFF15161A);
-  static const Color ink = Color(0xFF15161A);
-  static const Color inkOnDark = Color(0xFFFFFFFF);
-  static const Color inkMuted = Color(0xFF6B6D76);
-  static const Color inkMutedOnDark = Color(0xFFB7B9C2);
+  static const Color canvasDark = Color(0xFF121212);
+  static const Color surfaceCard = Color(0xFF363636);
+  static const Color surfaceCardAlt = Color(0xFF22222E);
+  static const Color hairline = Color(0xFF2C2C38);
+  static const Color navBar = Color(0xFF363636);
+  static const Color ink = Color(0xFFFFFFFF);
+  static const Color inkMuted = Color(0xFFB9B9B9);
+  static const Color inkFaint = Color(0xFF55555F);
+  static const Color primary = Color(0xFF8687E7);
+  static const Color primaryDim = Color(0xFF4A4470);
+  static const Color onPrimary = Color(0xFFFFFFFF);
+  static const Color error = Color(0xFFFF5C5C);
+  static const Color weekendRed = Color(0xFFFF4949);
+  static const Color surfaceCharcoal = Color(0xFF272727);
+  static const Color mutedLavender = Color(0xFF8A8FD9);
+  static const Color catGrocery = Color(0xFFB5E6A8);
+  static const Color catWork = Color(0xFFFFD080);
+  static const Color catSport = Color(0xFF9EE7E0);
+  static const Color catDesign = Color(0xFFB8E8D3);
+  static const Color catUniversity = Color(0xFF8586E7);
+  static const Color catSocial = Color(0xFFF0B5DD);
+  static const Color catMusic = Color(0xFFD4A9EB);
+  static const Color catHealth = Color(0xFFA8E3C5);
+  static const Color catMovie = Color(0xFFA4D5F0);
+  static const Color catHome = Color(0xFFFF8080);
 
-  // Block palette — full-bleed card fills
-  static const Color blockSage = Color(0xFFC8E6C9);
-  static const Color blockSageText = Color(0xFF1E3A24);
-  static const Color blockLavender = Color(0xFFDED9F7);
-  static const Color blockLavenderText = Color(0xFF2E2555);
-  static const Color blockPeach = Color(0xFFF8DFC0);
-  static const Color blockPeachText = Color(0xFF5A3A12);
-  static const Color blockCoral = Color(0xFFF7C9CB);
-  static const Color blockCoralText = Color(0xFF5C1D22);
-  static const Color blockSky = Color(0xFFC9E4F5);
-  static const Color blockSkyText = Color(0xFF123A54);
-  static const Color blockBlack = Color(0xFF15161A);
-  static const Color blockBlackText = Color(0xFFFFFFFF);
+  static const List<Color> categoryColors = [
+    catGrocery, catWork, catSport, catDesign,
+    catUniversity, catSocial, catMusic, catHealth,
+    catMovie, catHome,
+  ];
 
-  // Accent — interactive/primary ONLY
-  static const Color accent = Color(0xFFFFC93C);
-  static const Color accentInk = Color(0xFF15161A);
+  static const List<String> categoryColorNames = [
+    'Grocery', 'Work', 'Sport', 'Design',
+    'University', 'Social', 'Music', 'Health',
+    'Movie', 'Home',
+  ];
 
-  // Semantic
-  static const Color success = Color(0xFF2E7D46);
-  static const Color error = Color(0xFFC23B3F);
-
-  // Card surface (for task cards that aren't block-color)
-  static const Color cardWhite = Color(0xFFFFFFFF);
-  static const Color cardDark = Color(0xFF1E1F24);
-
-  // Priority ribbon colors
-  static const Color priorityHigh = blockCoral;
-  static const Color priorityHighText = blockCoralText;
-  static const Color priorityMedium = accent;
-  static const Color priorityMediumText = accentInk;
-  static const Color priorityLow = blockSage;
-  static const Color priorityLowText = blockSageText;
-
-  // Hairline
-  static const Color hairline = Color(0xFFE5E5EA);
-  static const Color hairlineOnDark = Color(0xFF2A2B30);
-
-  // ── Backward-compatible aliases (old Apple system → new bento) ──
-  static const Color primary = accent;
-  static const Color onPrimary = accentInk;
-  static const Color primaryFocus = accent;
-  static const Color primaryDim = Color(0xFFE6B800);
-  static const Color primaryBright = accent;
-  static Color get primarySoft => accent.withOpacity(0.10);
-  static const Color surfacePearl = cardWhite;
-  static const Color surface0 = canvas;
-  static const Color surface1 = canvas;
-  static const Color surface2 = cardWhite;
-  static const Color surface3 = cardWhite;
-  static const Color canvasParchment = canvas;
-  static const Color onDark = inkOnDark;
-  static const Color hairlineStrong = hairline;
-  static const Color dividerSoft = hairline;
-  static const Color inkSubtle = inkMuted;
-  static const Color priorityLowSoft = blockSage;
-  static Color get priorityMediumSoft => accent.withOpacity(0.10);
-  static const Color priorityHighSoft = blockCoral;
+  // Backward-compatible aliases
+  static const Color canvas = canvasDark;
+  static const Color surface = surfaceCard;
+  static const Color surface1 = surfaceCard;
+  static const Color surface2 = surfaceCardAlt;
+  static const Color surfaceMuted = surfaceCardAlt;
+  static const Color accent = primary;
+  static const Color accentMuted = primaryDim;
+  static const Color onAccent = onPrimary;
+  static const Color success = primary;
 }

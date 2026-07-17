@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/task.dart';
-import '../domain/task_priority.dart';
 import '../domain/task_filter.dart';
 import 'task_providers.dart';
 
@@ -13,7 +12,7 @@ class TaskController {
   Future<void> createTask({
     required String title,
     String? description,
-    TaskPriority priority = TaskPriority.medium,
+    int priority = 5,
     DateTime? dueDate,
   }) async {
     final repository = _ref.read(taskRepositoryProvider);
