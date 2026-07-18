@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../../lib/features/auth/domain/app_user.dart';
-import '../../../lib/features/auth/application/auth_controller.dart';
+import '../../lib/models/app_user.dart';
+import '../../lib/services/auth_service.dart';
 
 void main() {
   group('AppException', () {

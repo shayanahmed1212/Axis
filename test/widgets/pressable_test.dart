@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:axis/core/widgets/pressable.dart';
+import 'package:axis/widgets/ui_elements.dart';
 
 void main() {
   group('Pressable', () {

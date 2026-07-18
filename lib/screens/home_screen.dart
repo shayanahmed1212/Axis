@@ -81,29 +81,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      body: tasksAsync.when(
-        data: (tasks) {
-          final isEmpty = tasks.isEmpty;
-          return Column(
-            children: [
-              if (!isEmpty) ...[
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppTokens.pageMargin),
-                  child: TextField(
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: AppTokens.md),
+        child: tasksAsync.when(
+          data: (tasks) {
+            final isEmpty = tasks.isEmpty;
+            return Column(
+              children: [
+                if (!isEmpty) ...[
+                  const SizedBox(height: 4),
+                  TextField(
                     controller: _searchController,
                     style: AppTypography.body(color: AppColors.ink),
                     decoration: InputDecoration(
                       hintText: 'Search for your task\u2026',
                       hintStyle: AppTypography.body(color: AppColors.inkMuted),
                       prefixIcon: Icon(Icons.search_rounded, color: AppColors.inkMuted, size: 20),
-                      filled: false,
+                      filled: true,
+                      fillColor: AppColors.surfaceCard,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppTokens.radiusSm),
-                        borderSide: BorderSide(color: AppColors.hairline),
+                        borderSide: BorderSide.none,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppTokens.radiusSm),
-                        borderSide: BorderSide(color: AppColors.hairline),
+                        borderSide: BorderSide.none,
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppTokens.radiusSm),
@@ -113,11 +115,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     onChanged: (value) => setState(() => _searchQuery = value),
                   ),
-                ),
-                const SizedBox(height: AppTokens.sm),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppTokens.pageMargin),
-                  child: Align(
+                  const SizedBox(height: 16),
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
                       onTap: () => _showFilterSheet(context),
@@ -141,23 +140,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 12),
+                ],
+                Expanded(
+                  child: isEmpty
+                      ? _EmptyState(onAddTask: () => _showAddTaskSheet(context))
+                      : _buildTaskList(tasks, categoriesAsync),
                 ),
-                const SizedBox(height: AppTokens.lg),
               ],
-              Expanded(
-                child: isEmpty
-                    ? _EmptyState(onAddTask: () => _showAddTaskSheet(context))
-                    : _buildTaskList(tasks, categoriesAsync),
-              ),
-            ],
-          );
-        },
+            );
+          },
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (e, _) {
           final isPermissionDenied = e is FirebaseException && e.code == 'permission-denied';
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(vertical: 24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -187,6 +185,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         },
       ),
+      ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: 0,
         onTap: (index) {
@@ -208,7 +207,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         : tasks.where((t) => t.title.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
 
     return ListView.builder(
-      padding: EdgeInsets.all(AppTokens.pageMargin),
+      padding: EdgeInsets.only(bottom: AppTokens.md),
       itemCount: filteredTasks.length,
       itemBuilder: (context, index) {
         final task = filteredTasks[index];

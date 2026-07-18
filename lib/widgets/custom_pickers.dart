@@ -623,22 +623,19 @@ class _CustomTimePickerDialogState extends State<_CustomTimePickerDialog> {
               ),
               const SizedBox(height: 24),
               SizedBox(
-                height: wheelHeight,
+                height: 95,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _buildCard(
-                      width: 60,
-                      child: _WheelColumn(
-                        controller: _hourController,
-                        items: _hours.map((h) => h.toString().padLeft(2, '0')).toList(),
-                        selectedIndex: _selectedHourIdx,
-                        onChanged: (index) => setState(() => _selectedHourIdx = index),
-                      ),
+                    _PickerColumn(
+                      controller: _hourController,
+                      items: _hours.map((h) => h.toString().padLeft(2, '0')).toList(),
+                      selectedIndex: _selectedHourIdx,
+                      onChanged: (index) => setState(() => _selectedHourIdx = index),
                     ),
                     const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
                         ':',
                         style: TextStyle(
@@ -648,27 +645,21 @@ class _CustomTimePickerDialogState extends State<_CustomTimePickerDialog> {
                         ),
                       ),
                     ),
-                    _buildCard(
-                      width: 60,
-                      child: _WheelColumn(
-                        controller: _minuteController,
-                        items: _minutes.map((m) => m.toString().padLeft(2, '0')).toList(),
-                        selectedIndex: _selectedMinuteIdx,
-                        onChanged: (index) => setState(() => _selectedMinuteIdx = index),
-                      ),
+                    _PickerColumn(
+                      controller: _minuteController,
+                      items: _minutes.map((m) => m.toString().padLeft(2, '0')).toList(),
+                      selectedIndex: _selectedMinuteIdx,
+                      onChanged: (index) => setState(() => _selectedMinuteIdx = index),
                     ),
                     const SizedBox(width: 12),
-                    _buildCard(
-                      width: 70,
-                      child: _WheelColumn(
-                        controller: _ampmController,
-                        items: const ['AM', 'PM'],
-                        selectedIndex: _selectedAmPmIdx,
-                        onChanged: (index) => setState(() {
-                          _selectedAmPmIdx = index;
-                          _isPM = index == 1;
-                        }),
-                      ),
+                    _PickerColumn(
+                      controller: _ampmController,
+                      items: const ['AM', 'PM'],
+                      selectedIndex: _selectedAmPmIdx,
+                      onChanged: (index) => setState(() {
+                        _selectedAmPmIdx = index;
+                        _isPM = index == 1;
+                      }),
                     ),
                   ],
                 ),
@@ -707,29 +698,15 @@ class _CustomTimePickerDialogState extends State<_CustomTimePickerDialog> {
     );
   }
 
-  static const double wheelHeight = 96;
-
-  Widget _buildCard({required double width, required Widget child}) {
-    return Container(
-      width: width,
-      height: wheelHeight,
-      decoration: BoxDecoration(
-        color: const Color(0xFF313131),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: child,
-    );
-  }
 }
 
-class _WheelColumn extends StatelessWidget {
+class _PickerColumn extends StatelessWidget {
   final FixedExtentScrollController controller;
   final List<String> items;
   final ValueChanged<int> onChanged;
   final int selectedIndex;
 
-  const _WheelColumn({
+  const _PickerColumn({
     required this.controller,
     required this.items,
     required this.onChanged,
@@ -738,8 +715,14 @@ class _WheelColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: _CustomTimePickerDialogState.wheelHeight,
+    return Container(
+      width: 64,
+      height: 95,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2C2C2C),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: ListWheelScrollView(
         controller: controller,
         itemExtent: 38,
@@ -754,9 +737,7 @@ class _WheelColumn extends StatelessWidget {
             child: Text(
               items[index],
               style: TextStyle(
-                color: isSelected
-                    ? Colors.white
-                    : Colors.white.withOpacity(0.12),
+                color: isSelected ? Colors.white : const Color(0xFF555555),
                 fontSize: isSelected ? 22 : 14,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),

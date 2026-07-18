@@ -88,7 +88,7 @@ class AppTokens {
   static const double xxl = 32;
 
   // Page
-  static const double pageMargin = 20;
+  static const double pageMargin = 24;
   static const double cardPadding = 16;
 
   // Bottom sheet

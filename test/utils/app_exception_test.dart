@@ -3,8 +3,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../../lib/core/errors/app_exception.dart';
-import '../../../lib/core/errors/app_exception_types.dart';
+import '../../lib/utils/app_utils.dart';
 
 class MockAppException extends Mock implements AppException {}
 

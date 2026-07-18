@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../lib/core/utils/validators.dart';
+import '../../lib/utils/app_utils.dart';
 
 void main() {
   group('Validators.validateEmail', () {

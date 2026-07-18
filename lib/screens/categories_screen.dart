@@ -103,18 +103,24 @@ class CategoriesScreen extends ConsumerWidget {
     );
   }
 
-  void _showCreateSheet(BuildContext context, WidgetRef ref) {
-    Navigator.of(context).push(
+  Future<void> _showCreateSheet(BuildContext context, WidgetRef ref) async {
+    final result = await Navigator.of(context).push<String>(
       MaterialPageRoute(builder: (_) => const CreateCategorySheet()),
     );
+    if (result != null) {
+      ref.invalidate(categoriesStreamProvider);
+    }
   }
 
-  void _showEditSheet(BuildContext context, WidgetRef ref, Category category) {
-    Navigator.of(context).push(
+  Future<void> _showEditSheet(BuildContext context, WidgetRef ref, Category category) async {
+    final result = await Navigator.of(context).push<String>(
       MaterialPageRoute(
         builder: (_) => CreateCategorySheet(editingCategory: category),
       ),
     );
+    if (result != null) {
+      ref.invalidate(categoriesStreamProvider);
+    }
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref, Category category) async {

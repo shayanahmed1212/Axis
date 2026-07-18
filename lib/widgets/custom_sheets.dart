@@ -26,6 +26,7 @@ import 'package:axis/models/task.dart';
 import 'package:axis/models/category.dart';
 import 'package:axis/widgets/custom_pickers.dart';
 import 'package:axis/services/category_service.dart';
+import 'package:axis/utils/app_utils.dart';
 
 class AddTaskSheet extends ConsumerStatefulWidget {
   final Task? editingTask;
@@ -298,6 +299,7 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
         ).then((createdId) {
           if (!mounted) return;
           if (createdId != null) {
+            ref.invalidate(categoriesStreamProvider);
             setState(() => _selectedCategoryId = createdId);
           } else {
             _showCategorySheet(context);
@@ -970,6 +972,7 @@ class _TaskDetailSheetState extends ConsumerState<TaskDetailSheet> {
         ).then((createdId) {
           if (!mounted) return;
           if (createdId != null) {
+            ref.invalidate(categoriesStreamProvider);
             setState(() => _selectedCategoryId = createdId);
           } else {
             _showCategoryPicker(context);
@@ -1510,6 +1513,7 @@ class _CreateCategorySheetState extends ConsumerState<CreateCategorySheet> {
   String? _selectedIcon;
   late Color _selectedColor;
   bool _iconPickerOpen = false;
+  bool _saving = false;
 
   static const _paletteColors = [
     Color(0xFF8687E7),
@@ -1536,28 +1540,39 @@ class _CreateCategorySheetState extends ConsumerState<CreateCategorySheet> {
     super.dispose();
   }
 
-  bool get _isValid => _nameController.text.trim().isNotEmpty && _selectedIcon != null;
+  bool get _isValid => _nameController.text.trim().isNotEmpty && _selectedIcon != null && !_saving;
 
   Future<void> _save() async {
     if (!_isValid) return;
 
-    final hex = _colorToHex(_selectedColor);
-    final category = Category(
-      id: widget.editingCategory?.id ?? '',
-      name: _nameController.text.trim(),
-      iconName: _selectedIcon!,
-      colorHex: hex,
-      userId: '',
-      createdAt: widget.editingCategory?.createdAt ?? DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
+    setState(() => _saving = true);
+    try {
+      final hex = _colorToHex(_selectedColor);
+      final category = Category(
+        id: widget.editingCategory?.id ?? '',
+        name: _nameController.text.trim(),
+        iconName: _selectedIcon!,
+        colorHex: hex,
+        userId: '',
+        createdAt: widget.editingCategory?.createdAt ?? DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
 
-    if (widget.editingCategory != null) {
-      await ref.read(categoryRepositoryProvider).updateCategory(category);
-      if (mounted) Navigator.of(context).pop(category.id);
-    } else {
-      final created = await ref.read(categoryRepositoryProvider).createCategory(category);
-      if (mounted) Navigator.of(context).pop(created.id);
+      if (widget.editingCategory != null) {
+        await ref.read(categoryRepositoryProvider).updateCategory(category);
+        if (mounted) Navigator.of(context).pop(category.id);
+      } else {
+        final created = await ref.read(categoryRepositoryProvider).createCategory(category);
+        if (mounted) Navigator.of(context).pop(created.id);
+      }
+    } on AppException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 
@@ -1661,10 +1676,19 @@ class _CreateCategorySheetState extends ConsumerState<CreateCategorySheet> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                 ),
-                child: Text(
-                  widget.editingCategory != null ? 'Save' : 'Create Category',
-                  style: AppTypography.buttonLabel(weight: 700),
-                ),
+                child: _saving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.onPrimary,
+                        ),
+                      )
+                    : Text(
+                        widget.editingCategory != null ? 'Save' : 'Create Category',
+                        style: AppTypography.buttonLabel(weight: 700),
+                      ),
               ),
             ],
           ),

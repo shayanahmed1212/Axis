@@ -296,11 +296,13 @@ class AppStrings {
 }
 
 /// Wraps a [Stream] factory with automatic retry on transient
-/// permission-denied errors. Each retry waits `500ms * attempt` before
-/// re-subscribing to the stream. After [maxRetries] the error propagates.
+/// permission-denied and network errors. Each retry waits `500ms * attempt`
+/// before re-subscribing to the stream. After [maxRetries] the error
+/// propagates.
 ///
 /// Use this on initial Firestore snapshot streams that may fail right
-/// after registration/login because the Auth token hasn't synced yet.
+/// after registration/login because the Auth token hasn't synced yet, or
+/// when the network is flaky.
 Stream<T> retryStream<T>(
   Stream<T> Function() factory, {
   int maxRetries = 3,
@@ -312,9 +314,11 @@ Stream<T> retryStream<T>(
       return;
     } on AppException catch (e) {
       attempts++;
-      if (e.type != AppExceptionType.permissionDenied || attempts >= maxRetries) {
+      if (e.type != AppExceptionType.permissionDenied &&
+          e.type != AppExceptionType.networkError) {
         rethrow;
       }
+      if (attempts >= maxRetries) rethrow;
       await Future<void>.delayed(Duration(milliseconds: 500 * attempts));
     }
   }
@@ -331,9 +335,11 @@ Future<T> retryFuture<T>(
       return await factory();
     } on AppException catch (e) {
       attempts++;
-      if (e.type != AppExceptionType.permissionDenied || attempts >= maxRetries) {
+      if (e.type != AppExceptionType.permissionDenied &&
+          e.type != AppExceptionType.networkError) {
         rethrow;
       }
+      if (attempts >= maxRetries) rethrow;
       await Future<void>.delayed(Duration(milliseconds: 500 * attempts));
     }
   }

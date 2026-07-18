@@ -32,13 +32,13 @@ class TaskCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(6),
       child: Container(
-        padding: const EdgeInsets.all(AppTokens.md),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: AppColors.surfaceCard,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
               onTap: onToggle,
@@ -46,7 +46,6 @@ class TaskCard extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 width: 22,
                 height: 22,
-                margin: const EdgeInsets.only(top: 2),
                 decoration: BoxDecoration(
                   color: task.isCompleted ? AppColors.inkMuted : Colors.transparent,
                   shape: BoxShape.circle,
@@ -61,11 +60,12 @@ class TaskCard extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(width: AppTokens.sm),
+            const SizedBox(width: 14),
 
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     task.title,
@@ -74,30 +74,33 @@ class TaskCard extends StatelessWidget {
                     ).copyWith(
                       decoration: task.isCompleted ? TextDecoration.lineThrough : null,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
                   ),
                   if (task.dueDate != null) ...[
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Text(
-                          _formatDueDate(task.dueDate!),
-                          style: AppTypography.meta(color: AppColors.inkMuted),
-                        ),
-                        const Spacer(),
-                        if (category != null && category!.id.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 6),
-                            child: _CategoryBadge(category: category!),
-                          ),
-                        _PriorityBadge(priority: task.priority),
-                      ],
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatDueDate(task.dueDate!),
+                      style: AppTypography.meta(color: AppColors.inkMuted),
                     ),
                   ],
                 ],
               ),
             ),
+
+            if (task.dueDate != null) ...[
+              const SizedBox(width: 12),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (category != null && category!.id.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: _CategoryBadge(category: category!),
+                    ),
+                  _PriorityBadge(priority: task.priority),
+                ],
+              ),
+            ],
           ],
         ),
       ),

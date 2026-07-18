@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../lib/features/tasks/domain/task.dart';
-import '../../../lib/features/tasks/domain/task_priority.dart';
+import '../../lib/models/task.dart';
+import '../../lib/models/task_priority.dart';
 
 void main() {
   group('Task model', () {
@@ -16,7 +16,7 @@ void main() {
         title: 'Test Task',
         description: 'Test description',
         isCompleted: false,
-        priority: TaskPriority.high,
+        priority: 8,
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
       );
@@ -25,13 +25,19 @@ void main() {
       expect(map['title'], 'Test Task');
       expect(map['description'], 'Test description');
       expect(map['is_completed'], false);
-      expect(map['priority'], 'high');
+      expect(map['priority'], 8);
     });
 
     test('priorityDisplay returns correct labels', () {
       expect(TaskPriority.low.displayName, 'Low');
       expect(TaskPriority.medium.displayName, 'Medium');
       expect(TaskPriority.high.displayName, 'High');
+    });
+
+    test('priority enum fromInt works correctly', () {
+      expect(TaskPriority.fromInt(1), TaskPriority.low);
+      expect(TaskPriority.fromInt(5), TaskPriority.medium);
+      expect(TaskPriority.fromInt(9), TaskPriority.high);
     });
   });
 }
